@@ -3,7 +3,7 @@
 Registro de evaluaciones y notas para docentes: instituciones, cursos, estudiantes, calendario de evaluaciones y
 libro de notas con promedios y situación de cada estudiante.
 
-- **App:** https://librodeclases.simon-andaurt.workers.dev
+- **App:** https://librodeclases.net
 - **Stack:** React + Vite, Cloudflare Workers (Static Assets + API), D1 y Better Auth.
 - **Código:** todo en [app/](app). El despliegue y la configuración están en [DEPLOY.md](DEPLOY.md).
 

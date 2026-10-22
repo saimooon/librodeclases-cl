@@ -55,8 +55,10 @@ Si una versión sale mal: **Workers & Pages → librodeclases → Deployments �
 
 ## Dominio propio
 
-Cuando `librodeclases.cl` esté en la cuenta de Cloudflare: **Workers & Pages → librodeclases → Settings →
-Domains & Routes → Add → Custom domain** → `librodeclases.cl` (y `www.librodeclases.cl` si se quiere).
+`librodeclases.net` (comprado en Cloudflare Registrar) está declarado en `routes` de
+[app/wrangler.jsonc](app/wrangler.jsonc) como Custom Domain: al desplegar, Cloudflare crea el registro DNS y el
+certificado HTTPS. La dirección `librodeclases.simon-andaurt.workers.dev` sigue funcionando para no romper los
+calendarios en vivo que ya se suscribieron con ella.
 
 ## Login con Google y Facebook
 
@@ -67,7 +69,7 @@ login social se vincula a esa cuenta.
 URLs de retorno (callback) que hay que registrar en cada proveedor:
 
 - `https://librodeclases.simon-andaurt.workers.dev/api/auth/callback/<google|facebook>`
-- `https://librodeclases.cl/api/auth/callback/<google|facebook>` (cuando el dominio esté activo)
+- `https://librodeclases.net/api/auth/callback/<google|facebook>` (dominio principal)
 - `http://localhost:5173/api/auth/callback/<google|facebook>` (desarrollo local)
 
 ### Google
@@ -76,7 +78,7 @@ URLs de retorno (callback) que hay que registrar en cada proveedor:
 2. **APIs y servicios → Pantalla de consentimiento de OAuth** (Google Auth Platform): tipo *Externo*, nombre
    "Libro de Clases.cl", correo de soporte; luego **Publicar app** para que cualquier cuenta pueda entrar.
 3. **Credenciales → Crear credenciales → ID de cliente OAuth → Aplicación web**, con los orígenes
-   (`https://librodeclases.simon-andaurt.workers.dev`, …) y las URLs de retorno de arriba.
+   (`https://librodeclases.net`, `https://librodeclases.simon-andaurt.workers.dev`, …) y las URLs de retorno de arriba.
 4. En `app/`:
    ```powershell
    npx wrangler secret put GOOGLE_CLIENT_ID
