@@ -119,7 +119,7 @@ export default function ProfileEditForm({ teacher, user, onSaved }) {
 						<button type="submit" className="mt-3 rounded-xl bg-teal px-4 py-2.5 text-sm font-bold text-white">Actualizar correo</button>
 					</>
 				) : (
-					<p className="mt-2 text-sm text-slate-500">Tu correo ({user.email}) se gestiona con tu cuenta de Google.</p>
+					<p className="mt-2 text-sm text-slate-500">Tu correo ({user.email}) se gestiona con tu cuenta de {user.providers?.includes('facebook') ? 'Facebook' : 'Google'}.</p>
 				)}
 				{emailStatus && <p className="mt-2 text-xs font-semibold text-slate-500">{emailStatus}</p>}
 			</form>

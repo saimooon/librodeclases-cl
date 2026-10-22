@@ -1,14 +1,23 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { authClient, authErrorMessage, GOOGLE_ENABLED } from '../lib/authClient';
-import GoogleButton from '../components/GoogleButton';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { authClient, authErrorMessage } from '../lib/authClient';
+import SocialButtons from '../components/SocialButtons';
 import Footer from '../components/Footer';
 import BrandLogo from '../components/BrandLogo';
+
+// Errores con que Better Auth vuelve de Google/Facebook.
+function socialErrorMessage(code) {
+	if (!code) return '';
+	if (code === 'access_denied') return 'Cancelaste el inicio de sesión.';
+	if (code === 'email_not_found') return 'Tu cuenta no compartió un correo. Revisa los permisos e inténtalo de nuevo.';
+	return 'No se pudo iniciar sesión. Inténtalo de nuevo o usa tu correo y contraseña.';
+}
 
 export default function LoginPage() {
 	const navigate = useNavigate();
 	const [form, setForm] = useState({ email: '', password: '' });
-	const [error, setError] = useState('');
+	const [searchParams] = useSearchParams();
+	const [error, setError] = useState(() => socialErrorMessage(searchParams.get('error')));
 	const [loading, setLoading] = useState(false);
 
 	async function handleSubmit(event) {
@@ -42,14 +51,7 @@ export default function LoginPage() {
 						{loading ? 'Ingresando…' : 'Ingresar'}
 					</button>
 				</form>
-				{GOOGLE_ENABLED && (
-					<>
-						<div className="my-4 flex items-center gap-3 text-xs font-semibold uppercase text-slate-400">
-							<div className="h-px flex-1 bg-slate-200" /> o <div className="h-px flex-1 bg-slate-200" />
-						</div>
-						<GoogleButton label="Continuar con Google" />
-					</>
-				)}
+				<SocialButtons />
 				<p className="mt-5 text-center text-sm text-slate-500">
 					¿No tienes cuenta? <Link to="/register" className="font-bold text-teal">Regístrate gratis</Link>
 				</p>

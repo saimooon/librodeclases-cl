@@ -9,7 +9,7 @@ Todo corre en Cloudflare, sin Firebase:
 |---|---|
 | Frontend (Vite + React) | Workers Static Assets |
 | API (`/api/teacher/*`) | Worker en [app/worker/index.js](app/worker/index.js) |
-| Login (correo/contraseña, Google opcional) | [Better Auth](https://better-auth.com) dentro del mismo Worker ([app/worker/auth.js](app/worker/auth.js)) |
+| Login (correo/contraseña; Google y Facebook opcionales) | [Better Auth](https://better-auth.com) dentro del mismo Worker ([app/worker/auth.js](app/worker/auth.js)) |
 | Base de datos | D1 `librodeclases` (esquema en [app/migrations](app/migrations)) |
 | Tarea diaria (vencer trials) | Cron Trigger del Worker |
 
@@ -58,12 +58,48 @@ Si una versión sale mal: **Workers & Pages → librodeclases → Deployments �
 Cuando `librodeclases.cl` esté en la cuenta de Cloudflare: **Workers & Pages → librodeclases → Settings →
 Domains & Routes → Add → Custom domain** → `librodeclases.cl` (y `www.librodeclases.cl` si se quiere).
 
-## Login con Google (opcional)
+## Login con Google y Facebook
 
-1. En Google Cloud Console → APIs y servicios → Credenciales → **ID de cliente OAuth** (Aplicación web).
-   - URI de redirección: `https://<dominio>/api/auth/callback/google` (y `http://localhost:5173/api/auth/callback/google` para local).
-2. `npx wrangler secret put GOOGLE_CLIENT_ID` y `npx wrangler secret put GOOGLE_CLIENT_SECRET`.
-3. Compilar con `VITE_GOOGLE_AUTH=true` (en `app/.env.local` o como variable de build en Workers Builds).
+Cada botón aparece solo cuando el Worker tiene los secretos de ese proveedor (lo consulta en `/api/auth-config`),
+así que activarlos no requiere recompilar ni hacer push. Si alguien ya tenía cuenta con el mismo correo, el
+login social se vincula a esa cuenta.
+
+URLs de retorno (callback) que hay que registrar en cada proveedor:
+
+- `https://librodeclases.simon-andaurt.workers.dev/api/auth/callback/<google|facebook>`
+- `https://librodeclases.cl/api/auth/callback/<google|facebook>` (cuando el dominio esté activo)
+- `http://localhost:5173/api/auth/callback/<google|facebook>` (desarrollo local)
+
+### Google
+
+1. [Google Cloud Console](https://console.cloud.google.com) → crear proyecto `librodeclases`.
+2. **APIs y servicios → Pantalla de consentimiento de OAuth** (Google Auth Platform): tipo *Externo*, nombre
+   "Libro de Clases.cl", correo de soporte; luego **Publicar app** para que cualquier cuenta pueda entrar.
+3. **Credenciales → Crear credenciales → ID de cliente OAuth → Aplicación web**, con los orígenes
+   (`https://librodeclases.simon-andaurt.workers.dev`, …) y las URLs de retorno de arriba.
+4. En `app/`:
+   ```powershell
+   npx wrangler secret put GOOGLE_CLIENT_ID
+   npx wrangler secret put GOOGLE_CLIENT_SECRET
+   ```
+
+### Facebook
+
+1. [Meta for Developers](https://developers.facebook.com/apps) → **Crear app** → caso de uso
+   *Autenticar y solicitar datos a los usuarios con el inicio de sesión con Facebook*.
+2. En el caso de uso, agregar el permiso **email** (además de `public_profile`).
+3. **Inicio de sesión con Facebook → Configuración**: pegar las URLs de retorno en *URI de redireccionamiento
+   de OAuth válidos*.
+4. **Configuración de la app → Básica**: URL de política de privacidad y de eliminación de datos (obligatorias
+   para publicar), y copiar el *Identificador de la app* y la *Clave secreta*.
+5. Cambiar la app a modo **Publicado** (en modo desarrollo solo pueden entrar los administradores de la app).
+6. En `app/`:
+   ```powershell
+   npx wrangler secret put FACEBOOK_CLIENT_ID
+   npx wrangler secret put FACEBOOK_CLIENT_SECRET
+   ```
+
+Para probar en local, poner los mismos valores en `app/.dev.vars` y reiniciar `npm run dev`.
 
 ## Modelo de datos
 

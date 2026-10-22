@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { authClient, authErrorMessage, GOOGLE_ENABLED } from '../lib/authClient';
+import { authClient, authErrorMessage } from '../lib/authClient';
 import { saveTeacherProfile } from '../services/teacherData';
 import { resizeImageToDataUrl } from '../lib/image';
 import HonorificPicker from '../components/HonorificPicker';
-import GoogleButton from '../components/GoogleButton';
+import SocialButtons from '../components/SocialButtons';
 import Footer from '../components/Footer';
 import BrandLogo from '../components/BrandLogo';
 
@@ -79,14 +79,7 @@ export default function RegisterPage() {
 						{loading ? 'Creando cuenta…' : 'Crear cuenta gratis'}
 					</button>
 				</form>
-				{GOOGLE_ENABLED && (
-					<>
-						<div className="my-4 flex items-center gap-3 text-xs font-semibold uppercase text-slate-400">
-							<div className="h-px flex-1 bg-slate-200" /> o <div className="h-px flex-1 bg-slate-200" />
-						</div>
-						<GoogleButton label="Registrarse con Google" />
-					</>
-				)}
+				<SocialButtons verb="Registrarse" />
 				<p className="mt-5 text-center text-sm text-slate-500">
 					¿Ya tienes cuenta? <Link to="/login" className="font-bold text-teal">Inicia sesión</Link>
 				</p>

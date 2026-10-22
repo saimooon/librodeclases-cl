@@ -1,4 +1,4 @@
-import { createAuth } from './auth';
+import { createAuth, socialProviders } from './auth';
 import { emptyData } from '../src/lib/domain';
 
 const TRIAL_DAYS = 30;
@@ -67,6 +67,8 @@ async function handleTeacher(request, env, auth, path) {
 export default {
 	async fetch(request, env) {
 		const path = new URL(request.url).pathname;
+		// Proveedores sociales activos, para que el login muestre solo los botones configurados.
+		if (path === '/api/auth-config') return json({ socialProviders: Object.keys(socialProviders(env)) });
 		const auth = createAuth(env, request);
 		if (path.startsWith('/api/auth/')) return auth.handler(request);
 		if (path.startsWith('/api/teacher')) return handleTeacher(request, env, auth, path);
