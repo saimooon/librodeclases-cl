@@ -243,6 +243,7 @@ export function allEvaluations(institutions) {
 			key: dateToComparable(evaluation.date),
 			institutionId: institution.id,
 			institutionName: institution.name,
+			subject: institution.subject || null,
 			courseId: course.id,
 			courseName: course.name,
 			courseColor: course.color,

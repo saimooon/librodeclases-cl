@@ -39,7 +39,7 @@ async function calendarFeed(env, token, origin) {
 	const row = await env.DB.prepare('SELECT data FROM teacher WHERE calendarToken = ?').bind(token).first();
 	const items = row ? allEvaluations(JSON.parse(row.data).institutions).sort((a, b) => a.key.localeCompare(b.key)) : [];
 	// Sin caché: cada consulta debe reflejar los últimos cambios, y nadie en el camino debe guardar copias.
-	return new Response(buildIcs(items, origin), {
+	return new Response(buildIcs(items, origin, { withProgress: true }), {
 		headers: { 'Content-Type': 'text/calendar; charset=utf-8', 'Cache-Control': 'private, no-store' },
 	});
 }

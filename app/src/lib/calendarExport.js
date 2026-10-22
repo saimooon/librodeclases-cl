@@ -13,15 +13,24 @@ function nextDayKey(key) {
 
 export const eventTitle = item => `${item.title} · ${item.courseName}`;
 
-function eventDetails(item, appUrl) {
+// Avance de notas de la evaluación; solo tiene sentido en el calendario en vivo, que se recalcula en cada consulta.
+function gradesLine(graded) {
+	if (!graded?.total) return null;
+	return graded.complete ? `Notas: completas (${graded.graded}/${graded.total})` : `Notas registradas: ${graded.graded} de ${graded.total} estudiantes`;
+}
+
+function eventDetails(item, appUrl, { withProgress = false } = {}) {
 	return [
+		`Evaluación: ${item.title}`,
 		`Tipo: ${item.type}`,
 		`Ponderación: ${item.weight}%`,
 		`Curso: ${item.courseName}`,
+		item.subject ? `Asignatura: ${item.subject}` : null,
 		`Institución: ${item.institutionName}`,
+		withProgress ? gradesLine(item.graded) : null,
 		'',
 		`Registrado en Libro de Clases.cl: ${appUrl}`,
-	].join('\n');
+	].filter(line => line !== null).join('\n');
 }
 
 // Abre Google Calendar con el evento ya completado; la profesora solo confirma con "Guardar".
@@ -31,6 +40,7 @@ export function googleCalendarUrl(item, appUrl) {
 		text: eventTitle(item),
 		dates: `${item.key}/${nextDayKey(item.key)}`,
 		details: eventDetails(item, appUrl),
+		location: item.institutionName,
 	});
 	return `https://calendar.google.com/calendar/render?${params}`;
 }
@@ -61,7 +71,8 @@ function foldLine(line) {
 
 const utcStamp = date => date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
 
-export function buildIcs(items, appUrl) {
+// withProgress: incluye el avance de notas (calendario en vivo); en una copia descargada quedaría desactualizado.
+export function buildIcs(items, appUrl, { withProgress = false } = {}) {
 	const stamp = utcStamp(new Date());
 	const lines = [
 		'BEGIN:VCALENDAR',
@@ -81,7 +92,8 @@ export function buildIcs(items, appUrl) {
 			`DTSTART;VALUE=DATE:${item.key}`,
 			`DTEND;VALUE=DATE:${nextDayKey(item.key)}`,
 			`SUMMARY:${escapeText(eventTitle(item))}`,
-			`DESCRIPTION:${escapeText(eventDetails(item, appUrl))}`,
+			`DESCRIPTION:${escapeText(eventDetails(item, appUrl, { withProgress }))}`,
+			`LOCATION:${escapeText(item.institutionName)}`,
 			`CATEGORIES:${escapeText(item.type)}`,
 			// Día completo "libre": no bloquea la agenda de la profesora.
 			'TRANSP:TRANSPARENT',
