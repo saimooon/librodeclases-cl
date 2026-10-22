@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
-import { allEvaluations } from '../lib/domain';
+import { allEvaluations, timestamp } from '../lib/domain';
+import { buildIcs, eventTitle, googleCalendarUrl } from '../lib/calendarExport';
+import { downloadBlob } from '../lib/download';
 
 const WEEKDAYS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 const MONTHS = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
@@ -40,6 +42,7 @@ export default function CalendarView({ institutions, onOpenCourse }) {
 	const [when, setWhen] = useState('upcoming');
 	const [cursor, setCursor] = useState(() => { const now = new Date(); return { year: now.getFullYear(), month: now.getMonth() }; });
 	const [selectedDay, setSelectedDay] = useState(todayKey);
+	const [exported, setExported] = useState(false);
 
 	const evaluations = useMemo(() => allEvaluations(institutions), [institutions]);
 	const visibleInstitutions = institutionId === 'all' ? institutions : institutions.filter(item => item.id === institutionId);
@@ -62,6 +65,12 @@ export default function CalendarView({ institutions, onOpenCourse }) {
 	}
 	function moveMonth(step) {
 		setCursor(({ year, month }) => { const date = new Date(year, month + step, 1); return { year: date.getFullYear(), month: date.getMonth() }; });
+	}
+	// Descarga un .ics con las evaluaciones de los filtros actuales (institución, cursos y tipo).
+	function exportIcs() {
+		const items = [...filtered].sort((a, b) => a.key.localeCompare(b.key));
+		downloadBlob(new Blob([buildIcs(items, window.location.origin)], { type: 'text/calendar;charset=utf-8' }), `evaluaciones-librodeclases_${timestamp()}.ics`);
+		setExported(true);
 	}
 	function goToday() {
 		const now = new Date();
@@ -110,6 +119,17 @@ export default function CalendarView({ institutions, onOpenCourse }) {
 							))}
 						</div>
 					</div>
+				)}
+				<div className="mt-4 flex flex-col gap-2 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
+					<p className="text-xs text-slate-500">{filtered.length ? `${filtered.length} evaluación(es) con estos filtros` : 'No hay evaluaciones con estos filtros.'}</p>
+					<button disabled={!filtered.length} onClick={exportIcs} className="rounded-xl px-4 py-2 text-sm font-bold text-teal ring-1 ring-slate-200 hover:bg-slate-50 disabled:opacity-50">Exportar a calendario (.ics)</button>
+				</div>
+				{exported && (
+					<p className="mt-2 rounded-xl bg-[#e5f4f1] p-3 text-xs">
+						Archivo descargado. Para verlo en Google Calendar abre{' '}
+						<a href="https://calendar.google.com/calendar/r/settings/export" target="_blank" rel="noopener noreferrer" className="font-bold text-teal underline">Configuración → Importar y exportar</a>
+						, elige el archivo y el calendario donde quieres las evaluaciones. Es una copia del momento: si después cambias fechas, usa «+ Calendar» en esa evaluación o vuelve a exportar.
+					</p>
 				)}
 			</div>
 
@@ -214,7 +234,10 @@ function EvaluationList({ items, todayKey, groupByMonth = false, onOpenCourse, e
 									{past && graded && <span className={graded.complete ? 'text-teal' : 'font-semibold text-[#987513]'}> · {graded.complete ? '✓ notas completas' : `${graded.graded}/${graded.total} notas`}</span>}
 								</p>
 							</div>
-							<button onClick={() => onOpenCourse(item.institutionId, item.courseId)} className="shrink-0 rounded-lg px-2.5 py-1.5 text-xs font-bold text-teal ring-1 ring-slate-200">Notas →</button>
+							<div className="flex shrink-0 flex-col gap-1.5 sm:flex-row">
+								<a href={googleCalendarUrl(item, window.location.origin)} target="_blank" rel="noopener noreferrer" aria-label={`Agregar "${eventTitle(item)}" a Google Calendar`} title="Agregar a Google Calendar" className="rounded-lg px-2.5 py-1.5 text-center text-xs font-bold text-teal ring-1 ring-slate-200">+ Calendar</a>
+								<button onClick={() => onOpenCourse(item.institutionId, item.courseId)} className="rounded-lg px-2.5 py-1.5 text-xs font-bold text-teal ring-1 ring-slate-200">Notas →</button>
+							</div>
 						</div>
 					</li>
 				);
