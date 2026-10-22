@@ -1,0 +1,16 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Cada profesor solo puede leer y escribir su propio documento.
+    // Nota: los pagos/gating por plan quedan deferidos a una próxima versión; por ahora
+    // basta con registrarse y usar la app sin restricciones (los campos plan/trialEndsAt
+    // se siguen guardando para cuando se active esa fase, pero no bloquean escrituras).
+    match /teachers/{teacherId} {
+      allow read: if request.auth != null && request.auth.uid == teacherId;
+      allow create, update: if request.auth != null && request.auth.uid == teacherId;
+      allow delete: if false;
+    }
+  }
+}

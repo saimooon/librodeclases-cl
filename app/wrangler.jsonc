@@ -1,0 +1,23 @@
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"name": "librodeclases",
+	"main": "./worker/index.js",
+	"compatibility_date": "2026-10-19",
+	"compatibility_flags": ["nodejs_compat"],
+	"assets": {
+		// Las rutas de React Router (/login, /demo, …) devuelven index.html; solo /api/* pasa por el Worker.
+		"not_found_handling": "single-page-application",
+		"run_worker_first": ["/api/*"]
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "librodeclases",
+			"database_id": "1d8e0a3e-fe07-4a94-9b68-3a44cfd28758",
+			"migrations_dir": "migrations"
+		}
+	],
+	// Marca diariamente como "expired" los trials vencidos (reemplaza la Cloud Function expireTrials).
+	"triggers": { "crons": ["0 7 * * *"] },
+	"observability": { "enabled": true }
+}

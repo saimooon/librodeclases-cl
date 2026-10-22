@@ -1,0 +1,5 @@
+# Copiar a .dev.vars para desarrollo local (en producción se cargan con `npx wrangler secret put <NOMBRE>`).
+BETTER_AUTH_SECRET=
+# Opcional: login con Google (credencial OAuth "Aplicación web" de Google Cloud Console).
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=

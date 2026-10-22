@@ -1,0 +1,89 @@
+:root {
+	font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+	line-height: 1.5;
+	font-weight: 400;
+	color-scheme: light;
+}
+html { -webkit-text-size-adjust: 100%; }
+body { background: #f7f8fc; color: #16375c; margin: 0; overflow-x: hidden; }
+
+/* Degradé decorativo fijo al viewport: no se desplaza ni se estira con el contenido (tablas anchas, muchos cursos). */
+.mesh { position: relative; isolation: isolate; }
+.mesh::before {
+	content: '';
+	position: fixed;
+	inset: 0;
+	z-index: -1;
+	pointer-events: none;
+	background: radial-gradient(circle at 90% 5%, rgba(255,159,28,.16), transparent 28%), radial-gradient(circle at 10% 20%, rgba(27,76,128,.12), transparent 24%);
+}
+
+.fade-up { animation: fadeUp .45s ease both; }
+/* Termina en transform: none para no crear un bloque contenedor que afecte a elementos position: fixed. */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(8px) } to { opacity: 1; transform: none } }
+@media (prefers-reduced-motion: reduce) { .fade-up { animation: none; } }
+.nav-active { color: #1f6a67; background: #e5f4f1; }
+.mobile-nav { padding-bottom: env(safe-area-inset-bottom); }
+/* Filas de filtros con scroll horizontal en móvil: sin barra visible. */
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+input:focus, select:focus, textarea:focus { outline: 3px solid rgba(31,106,103,.15); border-color: #1f6a67; }
+/* Alto mínimo = pantalla visible: el pie de página queda pegado al fondo aunque haya poco contenido. */
+.app-min-h { min-height: 100vh; min-height: 100dvh; }
+/* En la app móvil se reserva el espacio del menú inferior fijo (incluido en el alto mínimo por box-sizing). */
+@media (max-width: 1023px) { .app-shell { padding-bottom: calc(76px + env(safe-area-inset-bottom)); } }
+
+/* Modo oscuro: se activa con la clase "dark" en <body> (ver ThemeContext). */
+body.dark { background: #111827; color: #e5e7eb; color-scheme: dark; }
+body.dark .mesh::before { opacity: .45; }
+
+/* Superficies */
+body.dark .bg-white, body.dark .bg-white\/80, body.dark .bg-white\/95 { background-color: #1f2937 !important; }
+body.dark .bg-paper { background-color: #172033 !important; }
+body.dark .bg-slate-100 { background-color: #273449 !important; }
+body.dark .bg-slate-200 { background-color: #4b5563 !important; }
+body.dark .hover\:bg-slate-50:hover, body.dark .hover\:bg-paper:hover { background-color: #273449 !important; }
+
+/* Bordes, anillos y divisores */
+body.dark .border-slate-200\/80, body.dark .border-slate-200, body.dark .border-slate-100 { border-color: #374151 !important; }
+body.dark .border-slate-300 { border-color: #4b5563 !important; }
+body.dark .ring-slate-200 { --tw-ring-color: #374151 !important; }
+body.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]) { border-color: #374151 !important; }
+
+/* Texto */
+body.dark .text-ink, body.dark .text-slate-600 { color: #e5e7eb !important; }
+body.dark .text-slate-500 { color: #cbd5e1 !important; }
+body.dark .text-slate-400 { color: #9ca3af !important; }
+body.dark .text-teal { color: #5ec4ba !important; }
+body.dark .text-\[\#c9543d\] { color: #fb9a85 !important; }
+body.dark .text-\[\#dc2626\], body.dark .text-\[\#b91c1c\] { color: #f87171 !important; }
+body.dark .text-\[\#987513\] { color: #ffb44d !important; }
+body.dark .text-\[\#4166aa\] { color: #93b4f0 !important; }
+body.dark .text-\[\#7451af\] { color: #c4a9f5 !important; }
+
+/* Etiquetas y fichas de color (estado, cursos, instituciones) */
+body.dark .bg-\[\#e5f4f1\] { background-color: rgba(94,196,186,.14) !important; }
+body.dark .bg-\[\#fff0eb\] { background-color: rgba(239,118,93,.16) !important; }
+body.dark .bg-\[\#fee2e2\] { background-color: rgba(248,113,113,.18) !important; }
+body.dark .bg-\[\#fff7db\] { background-color: rgba(255,159,28,.14) !important; }
+body.dark .bg-\[\#eaf1ff\] { background-color: rgba(147,180,240,.14) !important; }
+body.dark .bg-\[\#f2edff\] { background-color: rgba(196,169,245,.14) !important; }
+
+/* Navegación */
+body.dark .nav-active { color: #5ec4ba; background: rgba(94,196,186,.14); }
+body.dark .mobile-nav { background-color: rgba(31, 41, 55, .97); border-color: #374151; }
+body.dark .course-tab-active { background-color: #1f6a67 !important; }
+
+/* Formularios */
+body.dark input, body.dark select, body.dark textarea { background-color: #111827; color: #f9fafb; border-color: #4b5563; }
+body.dark input:focus, body.dark select:focus, body.dark textarea:focus { border-color: #5ec4ba; outline-color: rgba(94,196,186,.2); }
+body.dark input.border-coral { border-color: #ef765d; }
+/* Las opciones nativas heredan el color blanco del selector del Resumen; se fuerzan legibles. */
+.dashboard-course-picker option { color: #16375c; background: #ffffff; }
+body.dark .dashboard-course-picker { color: #ffffff; background: #1f2937; }
+body.dark .dashboard-course-picker option { color: #ffffff; background: #1f2937; }
+
+/* Logo: versión de color en tema claro y blanca en tema oscuro. */
+.brand-dark { display: none; }
+body.dark .brand-light { display: none; }
+body.dark .brand-dark { display: block; }
