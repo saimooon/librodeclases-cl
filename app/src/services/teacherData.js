@@ -38,6 +38,19 @@ export async function saveTeacherProfile(_uid, { displayName, honorific, email, 
 	return teacher;
 }
 
+// Calendario en vivo: activa o genera un enlace nuevo (el anterior deja de mostrar evaluaciones) o lo desactiva.
+export async function enableCalendarFeed() {
+	const { teacher } = await api('/api/teacher/calendar', { method: 'POST' });
+	publish(teacher);
+	return teacher;
+}
+
+export async function disableCalendarFeed() {
+	const { teacher } = await api('/api/teacher/calendar', { method: 'DELETE' });
+	publish(teacher);
+	return teacher;
+}
+
 const PAID_PLANS = ['monthly', 'annual', 'lifetime'];
 
 export function planStatus(teacher) {

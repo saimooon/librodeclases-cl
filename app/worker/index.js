@@ -1,5 +1,6 @@
 import { createAuth, socialProviders } from './auth';
-import { emptyData } from '../src/lib/domain';
+import { allEvaluations, emptyData } from '../src/lib/domain';
+import { buildIcs } from '../src/lib/calendarExport';
 
 const TRIAL_DAYS = 30;
 // Campos de perfil que el cliente puede modificar (plan y trialEndsAt quedan fuera a propósito).
@@ -23,6 +24,24 @@ async function ensureTeacher(env, user) {
 		'INSERT OR IGNORE INTO teacher (uid, email, displayName, photoDataUrl, plan, trialEndsAt, createdAt, data) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
 	).bind(user.id, user.email || null, user.name || null, user.image || null, 'trial', now + TRIAL_DAYS * 86_400_000, now, JSON.stringify(emptyData())).run();
 	return rowToTeacher(await env.DB.prepare('SELECT * FROM teacher WHERE uid = ?').bind(user.id).first());
+}
+
+// Token aleatorio (192 bits) para el enlace privado del calendario en vivo.
+function newCalendarToken() {
+	const bytes = crypto.getRandomValues(new Uint8Array(24));
+	return btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+// Calendario en vivo: Google Calendar (u Outlook/iPhone) lo consulta cada cierto tiempo sin sesión; el token es la llave.
+// Un token desconocido o desactivado devuelve un calendario vacío (no un error), para que quien siga
+// suscrito a un enlace viejo vea desaparecer las evaluaciones en vez de quedarse con una copia antigua.
+async function calendarFeed(env, token, origin) {
+	const row = await env.DB.prepare('SELECT data FROM teacher WHERE calendarToken = ?').bind(token).first();
+	const items = row ? allEvaluations(JSON.parse(row.data).institutions).sort((a, b) => a.key.localeCompare(b.key)) : [];
+	// Sin caché: cada consulta debe reflejar los últimos cambios, y nadie en el camino debe guardar copias.
+	return new Response(buildIcs(items, origin), {
+		headers: { 'Content-Type': 'text/calendar; charset=utf-8', 'Cache-Control': 'private, no-store' },
+	});
 }
 
 async function handleTeacher(request, env, auth, path) {
@@ -61,12 +80,24 @@ async function handleTeacher(request, env, auth, path) {
 		return json({ teacher: rowToTeacher(teacher) });
 	}
 
+	// Activa o genera un enlace nuevo (POST) o desactiva (DELETE) el calendario en vivo.
+	if (path === '/api/teacher/calendar' && (request.method === 'POST' || request.method === 'DELETE')) {
+		await ensureTeacher(env, user);
+		const token = request.method === 'POST' ? newCalendarToken() : null;
+		await env.DB.prepare('UPDATE teacher SET calendarToken = ? WHERE uid = ?').bind(token, user.id).run();
+		const teacher = await env.DB.prepare('SELECT * FROM teacher WHERE uid = ?').bind(user.id).first();
+		return json({ teacher: rowToTeacher(teacher) });
+	}
+
 	return json({ error: 'not_found' }, 404);
 }
 
 export default {
 	async fetch(request, env) {
-		const path = new URL(request.url).pathname;
+		const url = new URL(request.url);
+		const path = url.pathname;
+		const feed = path.match(/^\/api\/calendar\/([\w-]{16,64})\.ics$/);
+		if (feed && request.method === 'GET') return calendarFeed(env, feed[1], url.origin);
 		// Proveedores sociales activos, para que el login muestre solo los botones configurados.
 		if (path === '/api/auth-config') return json({ socialProviders: Object.keys(socialProviders(env)) });
 		const auth = createAuth(env, request);

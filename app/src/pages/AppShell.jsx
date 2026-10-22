@@ -335,7 +335,7 @@ export default function AppShell({ demo = false }) {
 							onRemoveEvaluation={handlers.removeEvaluation}
 						/>
 					)}
-					{view === 'calendar' && <CalendarView institutions={data.institutions} onOpenCourse={(institutionId, courseId) => handlers.openGradebook('all', institutionId, courseId)} />}
+					{view === 'calendar' && <CalendarView institutions={data.institutions} teacher={teacher} demo={demo} onOpenCourse={(institutionId, courseId) => handlers.openGradebook('all', institutionId, courseId)} />}
 					{view === 'courses' && (
 						<CoursesView
 							institution={institution} courses={institution?.courses || []} selectedCourseId={course?.id} readOnly={readOnly}

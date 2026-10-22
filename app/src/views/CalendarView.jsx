@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { allEvaluations, timestamp } from '../lib/domain';
 import { buildIcs, eventTitle, googleCalendarUrl } from '../lib/calendarExport';
 import { downloadBlob } from '../lib/download';
+import CalendarSubscription from '../components/CalendarSubscription';
 
 const WEEKDAYS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 const MONTHS = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
@@ -33,7 +34,7 @@ function monthGrid(year, month) {
 	return [...Array(weeks * 7)].map((_, index) => new Date(start.getFullYear(), start.getMonth(), start.getDate() + index));
 }
 
-export default function CalendarView({ institutions, onOpenCourse }) {
+export default function CalendarView({ institutions, onOpenCourse, teacher, demo }) {
 	const todayKey = toKey(new Date());
 	const [mode, setMode] = useState('month');
 	const [institutionId, setInstitutionId] = useState('all');
@@ -125,13 +126,22 @@ export default function CalendarView({ institutions, onOpenCourse }) {
 					<button disabled={!filtered.length} onClick={exportIcs} className="rounded-xl px-4 py-2 text-sm font-bold text-teal ring-1 ring-slate-200 hover:bg-slate-50 disabled:opacity-50">Exportar a calendario (.ics)</button>
 				</div>
 				{exported && (
-					<p className="mt-2 rounded-xl bg-[#e5f4f1] p-3 text-xs">
-						Archivo descargado. Para verlo en Google Calendar abre{' '}
-						<a href="https://calendar.google.com/calendar/r/settings/export" target="_blank" rel="noopener noreferrer" className="font-bold text-teal underline">Configuración → Importar y exportar</a>
-						, elige el archivo y el calendario donde quieres las evaluaciones. Es una copia del momento: si después cambias fechas, usa «+ Calendar» en esa evaluación o vuelve a exportar.
-					</p>
+					<div className="mt-2 space-y-1 rounded-xl bg-[#e5f4f1] p-3 text-xs">
+						<p className="font-bold">Archivo descargado. Para importarlo en Google Calendar sin riesgo:</p>
+						<p>
+							1. <a href="https://calendar.google.com/calendar/r/settings/createcalendar" target="_blank" rel="noopener noreferrer" className="font-bold text-teal underline">Crea un calendario nuevo</a>{' '}
+							(por ejemplo «Evaluaciones»). Así, si importas algo por error, borras ese calendario y se va todo junto.
+						</p>
+						<p>
+							2. En <a href="https://calendar.google.com/calendar/r/settings/export" target="_blank" rel="noopener noreferrer" className="font-bold text-teal underline">Importar y exportar</a>,
+							elige el archivo y ese calendario nuevo.
+						</p>
+						<p className="text-slate-500">Es una copia del momento: los cambios posteriores no se actualizan. Para eso usa el calendario en vivo de abajo.</p>
+					</div>
 				)}
 			</div>
+
+			<CalendarSubscription teacher={teacher} demo={demo} />
 
 			{mode === 'month' ? (
 				<MonthCalendar cursor={cursor} byDay={byDay} todayKey={todayKey} selectedDay={selectedDay} onSelectDay={setSelectedDay} onMove={moveMonth} onToday={goToday} onOpenCourse={onOpenCourse} />

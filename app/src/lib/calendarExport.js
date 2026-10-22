@@ -70,9 +70,12 @@ export function buildIcs(items, appUrl) {
 		'CALSCALE:GREGORIAN',
 		'METHOD:PUBLISH',
 		`X-WR-CALNAME:${escapeText(CALENDAR_NAME)}`,
+		// Sugerencia de frecuencia de actualización para calendarios suscritos (Apple/Outlook la respetan; Google decide la suya).
+		'REFRESH-INTERVAL;VALUE=DURATION:PT1H',
+		'X-PUBLISHED-TTL:PT1H',
 		...items.flatMap(item => [
 			'BEGIN:VEVENT',
-			// UID estable por evaluación: al reimportar, el calendario actualiza el evento en vez de duplicarlo.
+			// UID estable por evaluación: en el calendario en vivo, un cambio de fecha mueve el mismo evento.
 			`UID:${item.courseId}-${item.id}@librodeclases.cl`,
 			`DTSTAMP:${stamp}`,
 			`DTSTART;VALUE=DATE:${item.key}`,
