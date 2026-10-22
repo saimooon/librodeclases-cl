@@ -1,4 +1,4 @@
-# Libro de Clases.cl — despliegue en Cloudflare
+# Libro de Clases.net — despliegue en Cloudflare
 
 App multi-usuario (React + Cloudflare Workers) para ofrecer el servicio a varias profesoras en modelo freemium
 (30 días gratis, luego $3.99 USD/mes, $34.99 USD/año o $99 USD pago único de por vida).
@@ -76,7 +76,7 @@ URLs de retorno (callback) que hay que registrar en cada proveedor:
 
 1. [Google Cloud Console](https://console.cloud.google.com) → crear proyecto `librodeclases`.
 2. **APIs y servicios → Pantalla de consentimiento de OAuth** (Google Auth Platform): tipo *Externo*, nombre
-   "Libro de Clases.cl", correo de soporte; luego **Publicar app** para que cualquier cuenta pueda entrar.
+   "Libro de Clases.net", correo de soporte; luego **Publicar app** para que cualquier cuenta pueda entrar.
 3. **Credenciales → Crear credenciales → ID de cliente OAuth → Aplicación web**, con los orígenes
    (`https://librodeclases.net`, `https://librodeclases.simon-andaurt.workers.dev`, …) y las URLs de retorno de arriba.
 4. En `app/`:

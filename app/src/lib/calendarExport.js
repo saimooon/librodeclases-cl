@@ -29,7 +29,7 @@ function eventDetails(item, appUrl, { withProgress = false } = {}) {
 		`Institución: ${item.institutionName}`,
 		withProgress ? gradesLine(item.graded) : null,
 		'',
-		`Registrado en Libro de Clases.cl: ${appUrl}`,
+		`Registrado en Libro de Clases.net: ${appUrl}`,
 	].filter(line => line !== null).join('\n');
 }
 
@@ -77,7 +77,7 @@ export function buildIcs(items, appUrl, { withProgress = false } = {}) {
 	const lines = [
 		'BEGIN:VCALENDAR',
 		'VERSION:2.0',
-		'PRODID:-//Libro de Clases.cl//Evaluaciones//ES',
+		'PRODID:-//Libro de Clases.net//Evaluaciones//ES',
 		'CALSCALE:GREGORIAN',
 		'METHOD:PUBLISH',
 		`X-WR-CALNAME:${escapeText(CALENDAR_NAME)}`,
@@ -87,7 +87,7 @@ export function buildIcs(items, appUrl, { withProgress = false } = {}) {
 		...items.flatMap(item => [
 			'BEGIN:VEVENT',
 			// UID estable por evaluación: en el calendario en vivo, un cambio de fecha mueve el mismo evento.
-			`UID:${item.courseId}-${item.id}@librodeclases.cl`,
+			`UID:${item.courseId}-${item.id}@librodeclases.net`,
 			`DTSTAMP:${stamp}`,
 			`DTSTART;VALUE=DATE:${item.key}`,
 			`DTEND;VALUE=DATE:${nextDayKey(item.key)}`,

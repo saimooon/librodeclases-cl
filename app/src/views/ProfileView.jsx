@@ -111,7 +111,7 @@ export default function ProfileView({ teacher, user, demo, institutions, onExpor
 
 			<div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
 				<h3 className="font-display text-lg font-bold">Importar datos</h3>
-				<p className="mt-1 text-sm text-slate-500">Sube una nómina (JSON), un respaldo de Libro de Clases.cl (JSON, incluye todo) o una planilla CSV/Excel con el formato del export. En Excel, las anotaciones van en la hoja "Anotaciones"; el CSV no las incluye.</p>
+				<p className="mt-1 text-sm text-slate-500">Sube una nómina (JSON), un respaldo de Libro de Clases.net (JSON, incluye todo) o una planilla CSV/Excel con el formato del export. En Excel, las anotaciones van en la hoja "Anotaciones"; el CSV no las incluye.</p>
 				<div className="mt-4 flex flex-wrap items-center gap-2">
 					<select value={importMode} onChange={event => setImportMode(event.target.value)} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold">
 						<option value="merge">Agregar como nueva institución</option>

@@ -1,4 +1,4 @@
-# Libro de Clases.cl
+# Libro de Clases.net
 
 Registro de evaluaciones y notas para docentes: instituciones, cursos, estudiantes, calendario de evaluaciones y
 libro de notas con promedios y situación de cada estudiante.

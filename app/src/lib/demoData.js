@@ -135,5 +135,5 @@ export function buildDemoData() {
 	};
 }
 
-export const DEMO_USER = { uid: 'demo', email: 'demo@librodeclases.cl', displayName: 'María Demo', phoneNumber: null, providers: [] };
-export const DEMO_TEACHER = { displayName: 'María Demo', honorific: 'Profesora', email: 'demo@librodeclases.cl', plan: 'demo' };
+export const DEMO_USER = { uid: 'demo', email: 'demo@librodeclases.net', displayName: 'María Demo', phoneNumber: null, providers: [] };
+export const DEMO_TEACHER = { displayName: 'María Demo', honorific: 'Profesora', email: 'demo@librodeclases.net', plan: 'demo' };
